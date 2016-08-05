@@ -235,3 +235,6 @@ _Pvt_Extensions
 
 # VS Code
 .vscode/
+
+# Marvel API Auth Config
+marvel.auth.json

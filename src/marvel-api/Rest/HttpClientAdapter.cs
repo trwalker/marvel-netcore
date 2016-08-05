@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace marvel_api.Adapters
+namespace marvel_api.Rest
 {
     public class HttpClientAdapter : IHttpClientAdapter
     {

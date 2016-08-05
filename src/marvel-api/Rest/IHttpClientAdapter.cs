@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace marvel_api.Adapters
+namespace marvel_api.Rest
 {
     public interface IHttpClientAdapter : IDisposable
     {

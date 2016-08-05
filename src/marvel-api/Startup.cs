@@ -1,4 +1,6 @@
-using marvel_api.Adapters;
+using marvel_api.Characters;
+using marvel_api.Config;
+using marvel_api.Rest;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -13,9 +15,11 @@ namespace marvel_api
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile("App_Config/appsettings.json", optional: false, reloadOnChange: false)
+                .AddJsonFile($"App_Config/appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile("App_Config/marvel.auth.json", optional: false, reloadOnChange: false)
                 .AddEnvironmentVariables();
+
             Configuration = builder.Build();
         }
 
@@ -24,10 +28,11 @@ namespace marvel_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
             services.AddMvc();
-
-            services.AddTransient<IHttpClientAdapter, HttpClientAdapter>();
+            services.AddOptions();
+            
+            LoadConfiguration(services);
+            RegisterDependencies(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,6 +42,17 @@ namespace marvel_api
             loggerFactory.AddDebug();
 
             app.UseMvc();
+        }
+
+        private void LoadConfiguration(IServiceCollection services)
+        {
+            services.Configure<AuthConfigModel>(Configuration.GetSection("Marvel.Auth"));
+        }
+
+        private void RegisterDependencies(IServiceCollection services)
+        {
+            services.AddSingleton<ICharacterRepository, CharacterRepository>();
+            services.AddTransient<IHttpClientAdapter, HttpClientAdapter>();
         }
     }
 }
