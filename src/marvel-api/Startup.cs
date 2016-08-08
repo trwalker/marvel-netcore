@@ -1,3 +1,4 @@
+using marvel_api.Auth;
 using marvel_api.Characters;
 using marvel_api.Config;
 using marvel_api.Rest;
@@ -51,7 +52,10 @@ namespace marvel_api
 
         private void RegisterDependencies(IServiceCollection services)
         {
+            services.AddSingleton<ICredentialsService, CredentialsService>();
+            
             services.AddSingleton<ICharacterRepository, CharacterRepository>();
+
             services.AddTransient<IHttpClientAdapter, HttpClientAdapter>();
         }
     }

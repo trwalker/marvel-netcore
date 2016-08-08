@@ -1,31 +1,29 @@
 using System;
 using System.Threading.Tasks;
-using marvel_api.Config;
+using marvel_api.Auth;
 using marvel_api.Rest;
+using Newtonsoft.Json.Linq;
 
 namespace marvel_api.Characters
 {
     public class CharacterRepository : ICharacterRepository
     {
         private readonly IHttpClientAdapter _httpClientAdapter;
-        private readonly AuthConfigModel _authConfig;
+        private readonly ICredentialsService _credentialsService;
 
-        public CharacterRepository(IHttpClientAdapter httpClientAdapter, AuthConfigModel authConfig)
+        public CharacterRepository(ICredentialsService credentialsService, IHttpClientAdapter httpClientAdapter)
         {
             _httpClientAdapter = httpClientAdapter;
-            _authConfig = authConfig;
+            _credentialsService = credentialsService;
         }
 
-        public async Task<CharacterModel> GetCharacter(int characterId)
+        public async Task<JObject> GetCharacter(int characterId)
         {
-            var timeStamp = "11111111111";
-            var hash = "af542";
+            var credentials = _credentialsService.GenerateCredentials();
 
-            var getUrl = $"http://gateway.marvel.com/v1/public/characters/{characterId}?ts={timeStamp}&apikey={_authConfig.PublicKey}&hash={hash}";
+            var getUrl = $"http://gateway.marvel.com/v1/public/characters/{characterId}?ts={credentials.TimeStamp}&apikey={credentials.PublicKey}&hash={credentials.Hash}";
 
-            var characterJson = await _httpClientAdapter.GetAsync(new Uri(getUrl));
-
-            return new CharacterModel();
+            return await _httpClientAdapter.GetAsync(new Uri(getUrl));
         }
     }
 }

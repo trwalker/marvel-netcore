@@ -1,10 +1,10 @@
-
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace marvel_api.Characters
 {
     public interface ICharacterRepository
     {
-        Task<CharacterModel> GetCharacter(int characterId);
+        Task<JObject> GetCharacter(int characterId);
     }
 }

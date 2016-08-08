@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using marvel_api.Characters;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
@@ -7,6 +8,13 @@ namespace marvel_api.Controllers
     [Route("v1/[controller]")]
     public class CharactersController : Controller
     {
+        private readonly ICharacterRepository _characterRepository;
+
+        public CharactersController(ICharacterRepository characterRepository)
+        {
+            _characterRepository = characterRepository;
+        }
+
         [HttpGet]
         public async Task<JObject> GetAsync()
         {
@@ -16,7 +24,7 @@ namespace marvel_api.Controllers
         [HttpGet("{name}")]
         public async Task<JObject> GetAsync(string name)
         {
-            return await BuildCharacterAsync(name);
+            return await _characterRepository.GetCharacter(int.Parse(name));
         }
 
         private async Task<JObject> BuildCharactersAsync()
