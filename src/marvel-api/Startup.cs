@@ -52,6 +52,7 @@ namespace marvel_api
 
         private void RegisterDependencies(IServiceCollection services)
         {
+            services.AddSingleton<ICharacterService, CharacterService>();
             services.AddSingleton<ICredentialsService, CredentialsService>();
             
             services.AddSingleton<ICharacterRepository, CharacterRepository>();

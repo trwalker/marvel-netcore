@@ -8,54 +8,29 @@ namespace marvel_api.Controllers
     [Route("v1/[controller]")]
     public class CharactersController : Controller
     {
-        private readonly ICharacterRepository _characterRepository;
+        private readonly ICharacterService _characterService;
 
-        public CharactersController(ICharacterRepository characterRepository)
+        public CharactersController(ICharacterService characterService)
         {
-            _characterRepository = characterRepository;
+            _characterService = characterService;
         }
 
         [HttpGet]
         public async Task<JObject> GetAsync()
         {
-            return await BuildCharactersAsync();
+            var characters = await _characterService.GetCharacters();
+
+            return new JObject(
+                new JProperty("characters", JArray.FromObject(characters))
+            );
         }
 
         [HttpGet("{name}")]
         public async Task<JObject> GetAsync(string name)
         {
-            return await _characterRepository.GetCharacter(int.Parse(name));
-        }
-
-        private async Task<JObject> BuildCharactersAsync()
-        {
-            JObject characters = await Task.Factory.StartNew(() => {
-                // Imagine this is I/O, call to an API
-                return new JObject(
-                    new JProperty("characters", new JArray(
-                        new JObject(
-                            new JProperty("name", "spider-man")
-                        ),
-                        new JObject(
-                            new JProperty("name", "hulk")
-                        )
-                    ))
-                );
-            });
-
-            return characters;
-        }
-
-        private async Task<JObject> BuildCharacterAsync(string name)
-        {
-            JObject character = await Task.Factory.StartNew(() => {
-                // Imagine this is I/O, call to an API
-                return new JObject(
-                    new JProperty("name", name)
-                );
-            });
-
-            return character;
+            var character = await _characterService.GetCharacter(name);
+            
+            return JObject.FromObject(character);
         }
     }
 }
