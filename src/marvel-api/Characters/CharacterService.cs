@@ -7,15 +7,20 @@ namespace marvel_api.Characters
 {
     public class CharacterService : ICharacterService
     {
+        private ICharacterCacheService _characterCacheService;
         private ICharacterRepository _characterRepository;
 
-        public CharacterService(ICharacterRepository characterRepository)
+        public CharacterService(ICharacterCacheService characterCacheService, ICharacterRepository characterRepository)
         {
+            _characterCacheService = characterCacheService;
             _characterRepository = characterRepository;
         }
 
         public async Task<CharacterModel> GetCharacter(string characterName)
         {
+            // Check character cache
+            // If empty, call repo
+            // Put in character cache
             var characterResponse = await _characterRepository.GetCharacter(1009610);
 
             return BuildCharacterModel(characterResponse);
@@ -23,7 +28,16 @@ namespace marvel_api.Characters
 
         public async Task<IList<CharacterModel>> GetCharacters()
         {
-            throw new NotImplementedException();
+            // Check cache of list of Characters
+            // If empty, loop through the characters, calling GetCharacter()
+            // GetCharacter will pull from character by character cache if present
+            // Hydrate cache of list of characters
+
+            var characters = await Task.Factory.StartNew(() => {
+                return new List<CharacterModel>(); 
+            });
+
+            return characters;
         }
 
         private CharacterModel BuildCharacterModel(JObject characterResponse)

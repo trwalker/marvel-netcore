@@ -54,6 +54,7 @@ namespace marvel_api
         {
             services.AddSingleton<ICharacterService, CharacterService>();
             services.AddSingleton<ICredentialsService, CredentialsService>();
+            services.AddSingleton<ICharacterCacheService, CharacterCacheService>();
             
             services.AddSingleton<ICharacterRepository, CharacterRepository>();
 
