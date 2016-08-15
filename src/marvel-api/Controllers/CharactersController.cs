@@ -19,10 +19,8 @@ namespace marvel_api.Controllers
         public async Task<JObject> GetAsync()
         {
             var characters = await _characterService.GetCharacters();
-
-            return new JObject(
-                new JProperty("characters", JArray.FromObject(characters))
-            );
+            
+            return characters;
         }
 
         [HttpGet("{name}")]
@@ -30,7 +28,7 @@ namespace marvel_api.Controllers
         {
             var character = await _characterService.GetCharacter(name);
             
-            return JObject.FromObject(character);
+            return character;
         }
     }
 }

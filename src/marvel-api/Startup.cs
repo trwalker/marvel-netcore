@@ -1,3 +1,4 @@
+using System;
 using marvel_api.Auth;
 using marvel_api.Characters;
 using marvel_api.Config;
@@ -12,7 +13,7 @@ namespace marvel_api
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IHostingEnvironment env, IServiceProvider serviceProvider)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -22,9 +23,12 @@ namespace marvel_api
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
+            ServiceProvider = serviceProvider;
         }
 
         public IConfigurationRoot Configuration { get; }
+
+        public IServiceProvider ServiceProvider { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)

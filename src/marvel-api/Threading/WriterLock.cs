@@ -19,7 +19,7 @@ namespace marvel_api.Threading
 
         public void Dispose()
         {
-            _slimLock.ExitReadLock();
+            _slimLock.ExitWriteLock();
         }
     }
 }

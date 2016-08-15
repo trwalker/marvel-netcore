@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -16,28 +15,61 @@ namespace marvel_api.Characters
             _characterRepository = characterRepository;
         }
 
-        public async Task<CharacterModel> GetCharacter(string characterName)
+        public async Task HydrateCharacterCache()
         {
-            // Check character cache
-            // If empty, call repo
-            // Put in character cache
-            var characterResponse = await _characterRepository.GetCharacter(1009610);
+            var characterIds = CharacterMap.GetCharacterIds();
+            IList<Task<JObject>> characterGetTasks = new List<Task<JObject>>(characterIds.Count);
 
-            return BuildCharacterModel(characterResponse);
+            foreach(var characterId in characterIds)
+            {
+                characterGetTasks.Add(_characterRepository.GetCharacter(characterId));
+            }
+
+            IList<CharacterModel> characters = new List<CharacterModel>(characterGetTasks.Count);
+
+            foreach(var characterGetTask in characterGetTasks)
+            {
+                var characterResponse = await characterGetTask;
+                var characterModel = BuildCharacterModel(characterResponse);
+
+                characters.Add(characterModel);
+            }
+
+            _characterCacheService.HydrateCache(characters);
         }
 
-        public async Task<IList<CharacterModel>> GetCharacters()
+        public async Task<JObject> GetCharacter(string characterName)
         {
-            // Check cache of list of Characters
-            // If empty, loop through the characters, calling GetCharacter()
-            // GetCharacter will pull from character by character cache if present
-            // Hydrate cache of list of characters
+            JObject character = null;
 
-            var characters = await Task.Factory.StartNew(() => {
-                return new List<CharacterModel>(); 
-            });
+            if(IsValidCharacter(characterName))
+            {
+                if(!_characterCacheService.TryGetCharacter(characterName, out character))
+                {
+                    await HydrateCharacterCache();
+                    _characterCacheService.TryGetCharacter(characterName, out character);
+                }
+            }
+
+            return character;
+        }
+
+        public async Task<JObject> GetCharacters()
+        {
+            JObject characters;
+            if(!_characterCacheService.TryGetCharacterList(out characters))
+            {
+                await HydrateCharacterCache();
+                _characterCacheService.TryGetCharacterList(out characters);
+            }
 
             return characters;
+        }
+
+        private bool IsValidCharacter(string characterName)
+        {
+            int characterId;
+            return CharacterMap.TryGetCharacterIdByName(characterName, out characterId);
         }
 
         private CharacterModel BuildCharacterModel(JObject characterResponse)

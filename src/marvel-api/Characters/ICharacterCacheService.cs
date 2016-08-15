@@ -1,15 +1,14 @@
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace marvel_api.Characters
 {
     public interface ICharacterCacheService
     {
-        bool TryGetCharacter(string characterName, out CharacterModel character);
+        void HydrateCache(IList<CharacterModel> characters);
 
-        bool TryGetCharacterList(out IList<CharacterModel> characterList);
+        bool TryGetCharacter(string characterName, out JObject character);
 
-        void SetCharacter(CharacterModel character);
-
-        void SetCharacterList(IList<CharacterModel> characterList);
+        bool TryGetCharacterList(out JObject characters);
     }
 }
