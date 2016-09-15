@@ -22,6 +22,7 @@ namespace marvel_api
                 .UseConfiguration(config)
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseUrls("http://localhost:9000")
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();

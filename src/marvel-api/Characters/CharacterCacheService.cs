@@ -86,7 +86,7 @@ namespace marvel_api.Characters
 
         private bool IsCacheEmpty()
         {
-            return _characterListCache != null || _characterCache == null || _characterCache.Count == 0;
+            return _characterListCache == null || _characterCache == null || _characterCache.Count == 0;
         }
     }
 }

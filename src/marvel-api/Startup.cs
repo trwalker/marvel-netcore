@@ -5,6 +5,8 @@ using marvel_api.Config;
 using marvel_api.Rest;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -35,6 +37,18 @@ namespace marvel_api
         {
             services.AddMvc();
             services.AddOptions();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder => builder
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin());
+            });
+
+            services.Configure<MvcOptions>(options =>
+            {
+                options.Filters.Add(new CorsAuthorizationFilterFactory("AllowAll"));
+            });
             
             LoadConfiguration(services);
             RegisterDependencies(services);
@@ -47,6 +61,11 @@ namespace marvel_api
             loggerFactory.AddDebug();
 
             app.UseMvc();
+
+            app.UseCors(builder => builder
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowAnyOrigin());
         }
 
         private void LoadConfiguration(IServiceCollection services)
