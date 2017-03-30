@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using marvel_api.Auth;
 using marvel_api.Rest;
@@ -22,6 +23,8 @@ namespace marvel_api.Characters
             var credentials = _credentialsService.GenerateCredentials();
 
             var getUrl = $"http://gateway.marvel.com/v1/public/characters/{characterId}?ts={credentials.TimeStamp}&apikey={credentials.PublicKey}&hash={credentials.Hash}";
+
+            Console.WriteLine(getUrl);
 
             return await _httpClientAdapter.GetAsync(new Uri(getUrl));
         }

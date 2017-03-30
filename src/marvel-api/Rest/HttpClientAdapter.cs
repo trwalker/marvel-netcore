@@ -9,7 +9,7 @@ namespace marvel_api.Rest
 {
     public class HttpClientAdapter : IHttpClientAdapter
     {
-        private static readonly TimeSpan _defaultTimeout = TimeSpan.FromMilliseconds(1000);
+        private static readonly TimeSpan _defaultTimeout = TimeSpan.FromMilliseconds(10000);
 
         private readonly HttpClient _httpClient;
 

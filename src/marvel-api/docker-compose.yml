@@ -1,0 +1,10 @@
+version: "2"
+
+services:
+     marvel-api:
+          container_name: marvel-api
+          build:
+               context: .
+               dockerfile: .docker/marvel-api.dockerfile
+          ports:
+               - "9000:9000"

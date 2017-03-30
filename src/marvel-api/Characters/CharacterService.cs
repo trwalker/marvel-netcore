@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
@@ -19,20 +21,34 @@ namespace marvel_api.Characters
         {
             var characterIds = CharacterMap.GetCharacterIds();
             IList<Task<JObject>> characterGetTasks = new List<Task<JObject>>(characterIds.Count);
+            var characters = new List<CharacterModel>(characterGetTasks.Count);
 
             foreach(var characterId in characterIds)
             {
                 characterGetTasks.Add(_characterRepository.GetCharacter(characterId));
             }
 
-            IList<CharacterModel> characters = new List<CharacterModel>(characterGetTasks.Count);
-
-            foreach(var characterGetTask in characterGetTasks)
+            try
             {
-                var characterResponse = await characterGetTask;
-                var characterModel = BuildCharacterModel(characterResponse);
+                var characterGetResults = await Task.WhenAll(characterGetTasks.ToArray());
+                foreach(var characterGetResult in characterGetResults)
+                {
+                    try
+                    {
+                        var characterModel = BuildCharacterModel(characterGetResult);
 
-                characters.Add(characterModel);
+                        characters.Add(characterModel);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
 
             _characterCacheService.HydrateCache(characters);
@@ -87,7 +103,7 @@ namespace marvel_api.Characters
 
         private string ParseImage(JObject characterData)
         {
-            return characterData["thumbnail"]["path"].Value<string>() + "." + (string)characterData["thumbnail"]["extension"].Value<string>();
+            return characterData["thumbnail"]["path"].Value<string>() + "." + characterData["thumbnail"]["extension"].Value<string>();
         }
 
         private IList<string> ParseComics(JObject characterData)
@@ -96,8 +112,9 @@ namespace marvel_api.Characters
 
             var comicList = new List<string>(comics.Count);
 
-            foreach(JObject comic in comics)
+            foreach(var jToken in comics)
             {
+                var comic = (JObject) jToken;
                 comicList.Add(comic["name"].Value<string>());
             }
 

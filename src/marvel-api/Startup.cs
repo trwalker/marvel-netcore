@@ -1,21 +1,22 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using marvel_api.Auth;
 using marvel_api.Characters;
 using marvel_api.Config;
 using marvel_api.Rest;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Cors.Internal;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace marvel_api
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env, IServiceProvider serviceProvider)
+        public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -25,31 +26,16 @@ namespace marvel_api
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
-            ServiceProvider = serviceProvider;
         }
 
         public IConfigurationRoot Configuration { get; }
 
-        public IServiceProvider ServiceProvider { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add framework services.
             services.AddMvc();
-            services.AddOptions();
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll", builder => builder
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowAnyOrigin());
-            });
 
-            services.Configure<MvcOptions>(options =>
-            {
-                options.Filters.Add(new CorsAuthorizationFilterFactory("AllowAll"));
-            });
-            
             LoadConfiguration(services);
             RegisterDependencies(services);
         }
