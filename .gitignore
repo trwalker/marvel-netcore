@@ -236,5 +236,8 @@ _Pvt_Extensions
 # VS Code
 .vscode/
 
+# Jet Brains
+.idea
+
 # Marvel API Auth Config
 marvel.auth.json
