@@ -36,7 +36,6 @@ namespace marvel_api.Characters
                     try
                     {
                         var characterModel = BuildCharacterModel(characterGetResult);
-
                         characters.Add(characterModel);
                     }
                     catch (Exception ex)
